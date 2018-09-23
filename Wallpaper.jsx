@@ -45,26 +45,53 @@ var rightScreenBezelWidthmm = 9
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
+// The function that is the base of this script
+function copyAndSaveSelection(selection, originalDimension, outputDimension, fileName) {
+    // The options used to save the jpeg output files.
+    var wallpaperSaveOptions = new JPEGSaveOptions()
+    // I don't care what the input is, wallpapers should be good quality
+    wallpaperSaveOptions.quality = 12
+
+    // Set the source file as active
+    app.activeDocument = wallpaperFile
+    // Select the left screen's wallpaper
+    app.activeDocument.selection.select(selection)
+    // copy to clipboard
+    app.activeDocument.selection.copy()
+
+    // Create the image
+    var tempImage = app.documents.add(originalDimension[0], originalDimension[1])
+    // Set it as the active document
+    app.activeDocument = tempImage
+    // Paste the copied selection of the source file
+    app.activeDocument.paste()
+    // resize to the output dimensions
+    tempImage.resizeImage(outputDimension[0], outputDimension[1])
+    // Save it as the supplied filename in the selected location
+    tempImage.saveAs(new File(savePath + "/" + fileName), wallpaperSaveOptions)
+    // Close the file
+    tempImage.close(SaveOptions.DONOTSAVECHANGES)
+}
+
 // Save the current units of measurement, so we can leave everything as it was
 var originalUnits = preferences.rulerUnits
 // We need to work with pixels here
 preferences.rulerUnits = Units.PIXELS
+
+// Now, first off, let's calculate some stuff we need
 
 // Find the highest DPI
 screenHorizontalpxPermm = Math.max(leftScreenHorizontalpx / leftScreenWidthmm, middleScreenHorizontalpx / middleScreenWidthmm, rightScreenHorizontalpx / rightScreenWidthmm)
 screenVerticalpxPermm = Math.max(leftScreenVerticalpx / leftScreenHeightmm, middleScreenVerticalpx / middleScreenHeightmm, rightScreenVerticalpx / rightScreenHeightmm)
 
 // Set the left screen's wallpaper size, adjusted for the highest dpi screen
-var leftScreenAdjustedHorizontalpx = leftScreenWidthmm * screenHorizontalpxPermm
-var leftScreenAdjustedVerticalpx = leftScreenHeightmm * screenVerticalpxPermm
+var leftScreenAdjustedSize = Array(leftScreenWidthmm * screenHorizontalpxPermm, leftScreenHeightmm * screenVerticalpxPermm)
 
 // Set the middle screen's wallpaper size, adjusted for the highest dpi screen
-var middleScreenAdjustedHorizontalpx = middleScreenWidthmm * screenHorizontalpxPermm
-var middleScreenAdjustedVerticalpx = middleScreenHeightmm * screenVerticalpxPermm
+var middleScreenAdjustedSize = Array(middleScreenWidthmm * screenHorizontalpxPermm, middleScreenHeightmm * screenVerticalpxPermm)
 
 // Set the right screen's wallpaper size, adjusted for the highest dpi screen
-var rightScreenAdjustedHorizontalpx = rightScreenWidthmm * screenHorizontalpxPermm
-var rightScreenAdjustedVerticalpx = rightScreenHeightmm * screenVerticalpxPermm
+var rightScreenAdjustedSize = Array(rightScreenWidthmm * screenHorizontalpxPermm, rightScreenHeightmm * screenVerticalpxPermm)
 
 // Set the left screen's wallpaper vertical offset
 var leftScreenVerticalOffsetToppx = leftScreenVerticalOffsetTopmm * screenVerticalpxPermm
@@ -85,7 +112,7 @@ var middleScreenBezelWidthpx = middleScreenBezelWidthmm * screenHorizontalpxPerm
 var rightScreenBezelWidthpx = rightScreenBezelWidthmm * screenHorizontalpxPermm
 
 // Set the total width of the image
-var totalWidthpx = leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedHorizontalpx + rightScreenBezelWidthpx + rightScreenAdjustedHorizontalpx
+var totalWidthpx = leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedSize[0] + rightScreenBezelWidthpx + rightScreenAdjustedSize[0]
 
 // The area to select for the left screen's wallpaper
 var leftScreenSelection = Array(
@@ -94,43 +121,43 @@ var leftScreenSelection = Array(
         leftScreenVerticalOffsetToppx
     ),
     Array(
-        leftScreenAdjustedHorizontalpx,
+        leftScreenAdjustedSize[0],
         leftScreenVerticalOffsetToppx
     ),
     Array(
-        leftScreenAdjustedHorizontalpx,
-        (leftScreenVerticalOffsetToppx + leftScreenAdjustedVerticalpx)
+        leftScreenAdjustedSize[0],
+        (leftScreenVerticalOffsetToppx + leftScreenAdjustedSize[1])
     ),
     Array(
         0,
-        (leftScreenVerticalOffsetToppx + leftScreenAdjustedVerticalpx)
+        (leftScreenVerticalOffsetToppx + leftScreenAdjustedSize[1])
     )
 )
 
 // The area to select for the middle screen's wallpaper
 var middleScreenSelection = Array(
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + middleScreenBezelWidthpx),
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + middleScreenBezelWidthpx),
         middleScreenVerticalOffsetToppx
     ),
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + middleScreenBezelWidthpx + middleScreenAdjustedHorizontalpx),
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + middleScreenBezelWidthpx + middleScreenAdjustedSize[0]),
         middleScreenVerticalOffsetToppx
     ),
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + middleScreenBezelWidthpx + middleScreenAdjustedHorizontalpx),
-        (middleScreenVerticalOffsetToppx, middleScreenAdjustedVerticalpx)
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + middleScreenBezelWidthpx + middleScreenAdjustedSize[0]),
+        (middleScreenVerticalOffsetToppx, middleScreenAdjustedSize[1])
     ),
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + middleScreenBezelWidthpx),
-        (middleScreenVerticalOffsetToppx, middleScreenAdjustedVerticalpx)
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + middleScreenBezelWidthpx),
+        (middleScreenVerticalOffsetToppx, middleScreenAdjustedSize[1])
     )
 )
 
 // The area to select for the right screen's wallpaper
 var rightScreenSelection = Array(
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedHorizontalpx + rightScreenBezelWidthpx),
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedSize[0] + rightScreenBezelWidthpx),
         rightScreenVerticalOffsetToppx
     ),
     Array(
@@ -139,11 +166,11 @@ var rightScreenSelection = Array(
     ),
     Array(
         totalWidthpx,
-        (rightScreenVerticalOffsetToppx + rightScreenAdjustedVerticalpx)
+        (rightScreenVerticalOffsetToppx + rightScreenAdjustedSize[1])
     ),
     Array(
-        (leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedHorizontalpx + rightScreenBezelWidthpx),
-        (rightScreenVerticalOffsetToppx + rightScreenAdjustedVerticalpx)
+        (leftScreenAdjustedSize[0] + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedSize[0] + rightScreenBezelWidthpx),
+        (rightScreenVerticalOffsetToppx + rightScreenAdjustedSize[1])
     )
 )
 
@@ -157,53 +184,9 @@ var wallpaperFile = app.open(dialogFile[0])
 // We don't want any further dialogs
 app.displayDialogs = DialogModes.NO
 
-// The options used to save the jpeg output files.
-var wallpaperSaveOptions = new JPEGSaveOptions()
-// I don't care what the input is, wallpapers should be good quality
-wallpaperSaveOptions.quality = 12
-
-// Set the source file as active
-app.activeDocument = wallpaperFile
-// Select the left screen's wallpaper
-app.activeDocument.selection.select(leftScreenSelection)
-// copy to clipboard
-app.activeDocument.selection.copy()
-
-// Create the image for the left screen
-var leftScreen = app.documents.add(leftScreenAdjustedHorizontalpx, leftScreenAdjustedVerticalpx)
-// Set it as the active document
-app.activeDocument = leftScreen
-// Paste the copied selection of the source file
-app.activeDocument.paste()
-// resize to the output dimensions
-leftScreen.resizeImage(leftScreenHorizontalpx, leftScreenVerticalpx)
-// Save it as Left.jpg in the selected location
-leftScreen.saveAs(new File(savePath + "/Left.jpg"), wallpaperSaveOptions)
-// Close the file
-leftScreen.close(SaveOptions.DONOTSAVECHANGES)
-
-// Now do the same for middle and right
-app.activeDocument = wallpaperFile
-app.activeDocument.selection.select(middleScreenSelection)
-app.activeDocument.selection.copy()
-
-var middleScreen = app.documents.add(middleScreenAdjustedHorizontalpx, middleScreenAdjustedVerticalpx)
-app.activeDocument = middleScreen
-app.activeDocument.paste()
-middleScreen.resizeImage(middleScreenHorizontalpx, middleScreenVerticalpx)
-middleScreen.saveAs(new File(savePath + "/Middle.jpg"), wallpaperSaveOptions)
-middleScreen.close(SaveOptions.DONOTSAVECHANGES)
-
-app.activeDocument = wallpaperFile
-app.activeDocument.selection.select(rightScreenSelection)
-app.activeDocument.selection.copy()
-
-var rightScreen = app.documents.add(rightScreenAdjustedHorizontalpx, rightScreenAdjustedVerticalpx)
-app.activeDocument = rightScreen
-app.activeDocument.paste()
-rightScreen.resizeImage(rightScreenHorizontalpx, rightScreenVerticalpx)
-rightScreen.saveAs(new File(savePath + "/Right.jpg"), wallpaperSaveOptions)
-rightScreen.close(SaveOptions.DONOTSAVECHANGES)
+copyAndSaveSelection(leftScreenSelection, leftScreenAdjustedSize, Array(leftScreenHorizontalpx, leftScreenVerticalpx), "Left.jpg")
+copyAndSaveSelection(middleScreenSelection, middleScreenAdjustedSize, Array(middleScreenHorizontalpx, middleScreenVerticalpx), "Middle.jpg")
+copyAndSaveSelection(rightScreenSelection, rightScreenAdjustedSize, Array(rightScreenHorizontalpx, rightScreenVerticalpx), "Right.jpg")
 
 // Close the source file
 wallpaperFile.close(SaveOptions.DONOTSAVECHANGES)
