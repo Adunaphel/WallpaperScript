@@ -50,17 +50,9 @@ var originalUnits = preferences.rulerUnits
 // We need to work with pixels here
 preferences.rulerUnits = Units.PIXELS
 
-// This needs work...
-if (Math.max(leftScreenVerticalpx, middleScreenVerticalpx, rightScreenVerticalpx) == leftScreenVerticalpx) {
-    ScreenHorizontalpxPermm = leftScreenHorizontalpx / leftScreenWidthmm
-    ScreenVerticalpxPermm = leftScreenVerticalpx / leftScreenHeightmm
-} else if (Math.max(leftScreenVerticalpx, middleScreenVerticalpx, rightScreenVerticalpx) == middleScreenVerticalpx) {
-    ScreenHorizontalpxPermm = middleScreenHorizontalpx / middleScreenWidthmm
-    ScreenVerticalpxPermm = middleScreenVerticalpx / middleScreenHeightmm
-} else if (Math.max(leftScreenVerticalpx, middleScreenVerticalpx, rightScreenVerticalpx) == rightScreenVerticalpx) {
-    ScreenHorizontalpxPermm = rightScreenHorizontalpx / rightScreenWidthmm
-    ScreenVerticalpxPermm = rightScreenVerticalpx / rightScreenHeightmm
-}
+// Find the highest DPI
+ScreenHorizontalpxPermm = Math.max(leftScreenHorizontalpx / leftScreenWidthmm, middleScreenHorizontalpx / middleScreenWidthmm, rightScreenHorizontalpx / rightScreenWidthmm)
+ScreenVerticalpxPermm = Math.max(leftScreenVerticalpx / leftScreenHeightmm, middleScreenVerticalpx / middleScreenHeightmm, rightScreenVerticalpx / rightScreenHeightmm)
 
 // Set the left screen's wallpaper size, adjusted for the highest dpi screen
 var leftScreenAdjustedHorizontalpx = leftScreenWidthmm * ScreenHorizontalpxPermm
