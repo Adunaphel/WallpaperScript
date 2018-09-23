@@ -51,38 +51,38 @@ var originalUnits = preferences.rulerUnits
 preferences.rulerUnits = Units.PIXELS
 
 // Find the highest DPI
-ScreenHorizontalpxPermm = Math.max(leftScreenHorizontalpx / leftScreenWidthmm, middleScreenHorizontalpx / middleScreenWidthmm, rightScreenHorizontalpx / rightScreenWidthmm)
-ScreenVerticalpxPermm = Math.max(leftScreenVerticalpx / leftScreenHeightmm, middleScreenVerticalpx / middleScreenHeightmm, rightScreenVerticalpx / rightScreenHeightmm)
+screenHorizontalpxPermm = Math.max(leftScreenHorizontalpx / leftScreenWidthmm, middleScreenHorizontalpx / middleScreenWidthmm, rightScreenHorizontalpx / rightScreenWidthmm)
+screenVerticalpxPermm = Math.max(leftScreenVerticalpx / leftScreenHeightmm, middleScreenVerticalpx / middleScreenHeightmm, rightScreenVerticalpx / rightScreenHeightmm)
 
 // Set the left screen's wallpaper size, adjusted for the highest dpi screen
-var leftScreenAdjustedHorizontalpx = leftScreenWidthmm * ScreenHorizontalpxPermm
-var leftScreenAdjustedVerticalpx = leftScreenHeightmm * ScreenVerticalpxPermm
+var leftScreenAdjustedHorizontalpx = leftScreenWidthmm * screenHorizontalpxPermm
+var leftScreenAdjustedVerticalpx = leftScreenHeightmm * screenVerticalpxPermm
 
 // Set the middle screen's wallpaper size, adjusted for the highest dpi screen
-var middleScreenAdjustedHorizontalpx = middleScreenWidthmm * ScreenHorizontalpxPermm
-var middleScreenAdjustedVerticalpx = middleScreenHeightmm * ScreenVerticalpxPermm
+var middleScreenAdjustedHorizontalpx = middleScreenWidthmm * screenHorizontalpxPermm
+var middleScreenAdjustedVerticalpx = middleScreenHeightmm * screenVerticalpxPermm
 
 // Set the right screen's wallpaper size, adjusted for the highest dpi screen
-var rightScreenAdjustedHorizontalpx = rightScreenWidthmm * ScreenHorizontalpxPermm
-var rightScreenAdjustedVerticalpx = rightScreenHeightmm * ScreenVerticalpxPermm
+var rightScreenAdjustedHorizontalpx = rightScreenWidthmm * screenHorizontalpxPermm
+var rightScreenAdjustedVerticalpx = rightScreenHeightmm * screenVerticalpxPermm
 
 // Set the left screen's wallpaper vertical offset
-var leftScreenVerticalOffsetToppx = leftScreenVerticalOffsetTopmm * ScreenVerticalpxPermm
+var leftScreenVerticalOffsetToppx = leftScreenVerticalOffsetTopmm * screenVerticalpxPermm
 
 // Set the middle screen's wallpaper vertical offset
-var middleScreenVerticalOffsetToppx = middleScreenVerticalOffsetTopmm * ScreenVerticalpxPermm
+var middleScreenVerticalOffsetToppx = middleScreenVerticalOffsetTopmm * screenVerticalpxPermm
 
 // Set the right screen's wallpaper vertical offset
-var rightScreenVerticalOffsetToppx = rightScreenVerticalOffsetTopmm * ScreenVerticalpxPermm
+var rightScreenVerticalOffsetToppx = rightScreenVerticalOffsetTopmm * screenVerticalpxPermm
 
 // Set the bezel width of the left screen in pixels
-var leftScreenBezelWidthpx = leftScreenBezelWidthmm * ScreenVerticalpxPermm
+var leftScreenBezelWidthpx = leftScreenBezelWidthmm * screenHorizontalpxPermm
 
 // Set the bezel width of the middle screen in pixels
-var middleScreenBezelWidthpx = middleScreenBezelWidthmm * ScreenVerticalpxPermm
+var middleScreenBezelWidthpx = middleScreenBezelWidthmm * screenHorizontalpxPermm
 
 // Set the bezel width of the right screen in pixels
-var rightScreenBezelWidthpx = rightScreenBezelWidthmm * ScreenVerticalpxPermm
+var rightScreenBezelWidthpx = rightScreenBezelWidthmm * screenHorizontalpxPermm
 
 // Set the total width of the image
 var totalWidthpx = leftScreenAdjustedHorizontalpx + leftScreenBezelWidthpx + (2 * middleScreenBezelWidthpx) + middleScreenAdjustedHorizontalpx + rightScreenBezelWidthpx + rightScreenAdjustedHorizontalpx
