@@ -70,7 +70,6 @@ for (i = 0; i < screens.length; i++) {
     var horizontalPx = screens[i].width * horizontalPxPerMm
     var verticalPx = screens[i].height * verticalPxPerMm
     var verticalOffsetPx = screens[i].verticalOffsetTop * verticalPxPerMm
-    alert(bezelPx)
     if (offsetLeft > 0) {
         offsetLeft += bezelPx
     }
