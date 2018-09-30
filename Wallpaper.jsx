@@ -1,10 +1,27 @@
-var screens = [ new screenArea(296, 475, 1050, 1680, 17, 14), new screenArea(336, 597, 2160, 3840, 0, 17), new screenArea(313, 554, 1440, 2560, 3, 9) ];
+var screens = [
+    new screenArea(
+        // Height in mm
+        296,
+        //Width in mm
+        475,
+        // Vertical pixels
+        1050,
+        // Horizontal pixels
+        1680,
+        // Distance between top edge and highest top edge in mm
+        17,
+        // Width of horizontal bezel in mm
+        14
+    ),
+    new screenArea(336, 597, 2160, 3840, 0, 17),
+    new screenArea(313, 554, 1440, 2560, 3, 9)
+];
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
-// NO EDITING BEYOND THIS POINT!                                             //
+// NO EDITING NEEDED BEYOND THIS POINT!                                      //
 //                                                                           //
-
+///////////////////////////////////////////////////////////////////////////////
 
 function screenArea(height, width, verticalPx, horizontalPx, verticalOffsetTop, bezelWidth) {
     this.height = height;
@@ -16,36 +33,6 @@ function screenArea(height, width, verticalPx, horizontalPx, verticalOffsetTop, 
     this.horizontalPxPerMm = horizontalPx / width;
     this.verticalPxPerMm = verticalPx / height;
 }
-
-// The function that is the base of this script
-function copyAndSaveSelection(selection, originalDimension, outputDimension, fileName) {
-    // The options used to save the jpeg output files.
-    var wallpaperSaveOptions = new JPEGSaveOptions();
-    // I don't care what the input is, wallpapers should be good quality
-    wallpaperSaveOptions.quality = 12;
-
-    // Set the source file as active
-    app.activeDocument = wallpaperFile;
-    // Select the left screen's wallpaper
-    app.activeDocument.selection.select(selection);
-    // copy to clipboard
-    app.activeDocument.selection.copy();
-
-    // Create the image
-    var tempImage = app.documents.add(originalDimension[0], originalDimension[1]);
-    // Set it as the active document
-    app.activeDocument = tempImage;
-    // Paste the copied selection of the source file
-    app.activeDocument.paste();
-    // resize to the output dimensions
-    tempImage.resizeImage(outputDimension[0], outputDimension[1]);
-    // Save it as the supplied filename in the selected location
-    tempImage.saveAs(new File(savePath + "/" + fileName), wallpaperSaveOptions);
-    // Close the file
-    tempImage.close(SaveOptions.DONOTSAVECHANGES);
-};
-
-alert(screens)
 
 // Save the current units of measurement, so we can leave everything as it was
 var originalUnits = preferences.rulerUnits;
@@ -90,14 +77,36 @@ var savePath = Folder.selectDialog("Select where to save the output files")
 var wallpaperFile = app.open(dialogFile[0])
 
 // We don't want any further dialogs
-// app.displayDialogs = DialogModes.NO
+app.displayDialogs = DialogModes.NO
+
+var wallpaperSaveOptions = new JPEGSaveOptions();
+// I don't care what the input is, wallpapers should be good quality
+wallpaperSaveOptions.quality = 12;
 
 for (i = 0; i < screens.length; i++) {
-    copyAndSaveSelection(selections[i], [(screens[i].width * horizontalPxPerMm), (screens[i].height * verticalPxPerMm)], [screens[i].horizontalPx, screens[i].verticalPx], "screen" + i + ".jpg")
+    // Set the source file as active
+    app.activeDocument = wallpaperFile;
+    // Select the left screen's wallpaper
+    app.activeDocument.selection.select(selections[i]);
+    // copy to clipboard
+    app.activeDocument.selection.copy();
+
+    // Create the image
+    var tempImage = app.documents.add((screens[i].width * horizontalPxPerMm), (screens[i].height * verticalPxPerMm));
+    // Set it as the active document
+    app.activeDocument = tempImage;
+    // Paste the copied selection of the source file
+    app.activeDocument.paste();
+    // resize to the output dimensions
+    tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
+    // Save it as the supplied filename in the selected location
+    tempImage.saveAs(new File(savePath + "/" + "screen" + i + ".jpg"), wallpaperSaveOptions);
+    // Close the file
+    tempImage.close(SaveOptions.DONOTSAVECHANGES);
 }
 
 // Close the source file
 wallpaperFile.close(SaveOptions.DONOTSAVECHANGES)
 
-// Leave everythign as we encountered it
+// Leave everything as we encountered it
 preferences.rulerUnits = originalUnits
