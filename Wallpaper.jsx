@@ -47,31 +47,6 @@ for (i = 0; i < screens.length; i++) {
     verticalPxPerMm = Math.max(screens[i].verticalPxPerMm, verticalPxPerMm);
 }
 
-// Generate the selection rectangles we need
-selections = new Array();
-// We start at offset 0
-offsetLeft = 0;
-
-for (i = 0; i < screens.length; i++) {
-    var bezelPx = screens[i].bezelWidth * horizontalPxPerMm
-    var horizontalPx = screens[i].width * horizontalPxPerMm
-    var verticalPx = screens[i].height * verticalPxPerMm
-    var verticalOffsetPx = screens[i].verticalOffsetTop * verticalPxPerMm
-    // If we're at the first screen, we don't need to add the bezel
-    if (offsetLeft > 0) {
-        offsetLeft += bezelPx
-    }
-    // Selections are an array of coordinates, in this case, top left, top right, bottom right, bottom left
-    selections[i] = [
-        [offsetLeft, verticalOffsetPx],
-        [offsetLeft + horizontalPx, verticalOffsetPx],
-        [offsetLeft + horizontalPx, verticalOffsetPx + verticalPx],
-        [offsetLeft, verticalPx + verticalOffsetPx]
-    ]
-    // Set the offset for the next selection, by adding the width of the selection, and the width of the bezel
-    offsetLeft += (horizontalPx + bezelPx)
-}
-
 // Browse for the source file
 var dialogFile = app.openDialog()
 // Browse for where to save the output
@@ -86,16 +61,38 @@ var wallpaperSaveOptions = new JPEGSaveOptions();
 // I don't care what the input is, wallpapers should be good quality
 wallpaperSaveOptions.quality = 12;
 
+// We start at offset 0
+offsetLeft = 0;
+
 for (i = 0; i < screens.length; i++) {
+    // Caclulate the screen's pixel dimensions, adjusted for the highest DPI screen
+    var horizontalPx = screens[i].width * horizontalPxPerMm
+    var verticalPx = screens[i].height * verticalPxPerMm
+    var bezelPx = screens[i].bezelWidth * horizontalPxPerMm
+    var verticalOffsetPx = screens[i].verticalOffsetTop * verticalPxPerMm
+
+    // If we're at the first screen, we don't need to add the bezel
+    if (offsetLeft > 0) {
+        offsetLeft += bezelPx
+    }
+
+    // Selections are an array of coordinates, in this case, top left, top right, bottom right, bottom left
+    var selection = [
+        [offsetLeft, verticalOffsetPx],
+        [offsetLeft + horizontalPx, verticalOffsetPx],
+        [offsetLeft + horizontalPx, verticalOffsetPx + verticalPx],
+        [offsetLeft, verticalPx + verticalOffsetPx]
+    ]
+
     // Set the source file as active
     app.activeDocument = wallpaperFile;
-    // Select the left screen's wallpaper
-    app.activeDocument.selection.select(selections[i]);
+    // Select the current screen's area
+    app.activeDocument.selection.select(selection);
     // copy to clipboard
     app.activeDocument.selection.copy();
 
     // Create the image
-    var tempImage = app.documents.add((screens[i].width * horizontalPxPerMm), (screens[i].height * verticalPxPerMm));
+    var tempImage = app.documents.add(horizontalPx, verticalPx);
     // Set it as the active document
     app.activeDocument = tempImage;
     // Paste the copied selection of the source file
@@ -103,9 +100,12 @@ for (i = 0; i < screens.length; i++) {
     // resize to the output dimensions
     tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
     // Save it as the supplied filename in the selected location
-    tempImage.saveAs(new File(savePath + "/" + "screen" + i + ".jpg"), wallpaperSaveOptions);
+    tempImage.saveAs(new File(savePath + "/screen" + i + ".jpg"), wallpaperSaveOptions);
     // Close the file
     tempImage.close(SaveOptions.DONOTSAVECHANGES);
+
+    // Set the offset for the next screen, by adding the width of the selection, and the width of the bezel
+    offsetLeft += (horizontalPx + bezelPx)
 }
 
 // Close the source file
