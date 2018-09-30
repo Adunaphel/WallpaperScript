@@ -39,8 +39,6 @@ var originalUnits = preferences.rulerUnits;
 // We need to work with pixels here
 preferences.rulerUnits = Units.PIXELS;
 
-// Now, first off, let's calculate some stuff we need
-
 // Find the highest DPI
 var horizontalPxPerMm = 0
 var verticalPxPerMm = 0
@@ -49,7 +47,9 @@ for (i = 0; i < screens.length; i++) {
     verticalPxPerMm = Math.max(screens[i].verticalPxPerMm, verticalPxPerMm);
 }
 
+// Generate the selection rectangles we need
 selections = new Array();
+// We start at offset 0
 offsetLeft = 0;
 
 for (i = 0; i < screens.length; i++) {
@@ -57,15 +57,18 @@ for (i = 0; i < screens.length; i++) {
     var horizontalPx = screens[i].width * horizontalPxPerMm
     var verticalPx = screens[i].height * verticalPxPerMm
     var verticalOffsetPx = screens[i].verticalOffsetTop * verticalPxPerMm
+    // If we're at the first screen, we don't need to add the bezel
     if (offsetLeft > 0) {
         offsetLeft += bezelPx
     }
+    // Selections are an array of coordinates, in this case, top left, top right, bottom right, bottom left
     selections[i] = [
         [offsetLeft, verticalOffsetPx],
         [offsetLeft + horizontalPx, verticalOffsetPx],
         [offsetLeft + horizontalPx, verticalOffsetPx + verticalPx],
         [offsetLeft, verticalPx + verticalOffsetPx]
     ]
+    // Set the offset for the next selection, by adding the width of the selection, and the width of the bezel
     offsetLeft += (horizontalPx + bezelPx)
 }
 
