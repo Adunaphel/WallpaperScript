@@ -65,7 +65,7 @@ wallpaperSaveOptions.quality = 12;
 offsetLeft = 0;
 
 for (i = 0; i < screens.length; i++) {
-    // Caclulate the screen's pixel dimensions, adjusted for the highest DPI screen
+    // Calculate the screen's pixel dimensions, adjusted for the highest DPI screen
     var horizontalPx = screens[i].width * horizontalPxPerMm
     var verticalPx = screens[i].height * verticalPxPerMm
     var bezelPx = screens[i].bezelWidth * horizontalPxPerMm
@@ -97,8 +97,10 @@ for (i = 0; i < screens.length; i++) {
     app.activeDocument = tempImage;
     // Paste the copied selection of the source file
     app.activeDocument.paste();
-    // resize to the output dimensions
-    tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
+    // resize to the output dimensions, if necessary
+    if (screens[i].horizontalPxPerMm != horizontalPxPerMm) {
+        tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
+    }
     // Save it as the supplied filename in the selected location
     tempImage.saveAs(new File(savePath + "/screen" + i + ".jpg"), wallpaperSaveOptions);
     // Close the file
