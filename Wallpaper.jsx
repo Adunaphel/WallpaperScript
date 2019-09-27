@@ -9,12 +9,12 @@ var screens = [
         // Horizontal pixels
         1680,
         // Distance between top edge and highest top edge in mm
-        17,
+        112,
         // Width of horizontal bezel in mm
         14
     ),
-    new screenArea(336, 597, 2160, 3840, 0, 17),
-    new screenArea(313, 554, 1440, 2560, 3, 9)
+    new screenArea(336, 597, 2160, 3840, 70, 17),
+    new screenArea(554, 313, 2560, 1440, 0, 9)
 ];
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,37 +77,51 @@ for (i = 0; i < screens.length; i++) {
     }
 
     // Selections are an array of coordinates, in this case, top left, top right, bottom right, bottom left
-    var selection = [
+    var oldSelection = [
         [offsetLeft, verticalOffsetPx],
-        [offsetLeft + horizontalPx, verticalOffsetPx],
-        [offsetLeft + horizontalPx, verticalOffsetPx + verticalPx],
-        [offsetLeft, verticalPx + verticalOffsetPx]
+        [offsetLeft + horizontalPx + 1, verticalOffsetPx],
+        [offsetLeft + horizontalPx + 1, verticalOffsetPx + verticalPx + 1],
+        [offsetLeft, verticalPx + verticalOffsetPx + 1]
+    ]
+
+    var newSelection = [
+        [0, 0],
+        [horizontalPx + 1, 0],
+        [horizontalPx + 1, verticalPx + 1],
+        [0, verticalPx + 1]
     ]
 
     // Set the source file as active
     app.activeDocument = wallpaperFile;
     // Select the current screen's area
-    app.activeDocument.selection.select(selection);
+    app.activeDocument.selection.select(oldSelection);
     // copy to clipboard
     app.activeDocument.selection.copy();
 
     // Create the image
-    var tempImage = app.documents.add(horizontalPx, verticalPx);
+    var tempImage = app.documents.add(horizontalPx + 1, verticalPx + 1);
     // Set it as the active document
     app.activeDocument = tempImage;
+    app.activeDocument.selection.select(newSelection);
     // Paste the copied selection of the source file
-    app.activeDocument.paste();
-    // resize to the output dimensions, if necessary
-    if (screens[i].horizontalPxPerMm != horizontalPxPerMm) {
-        tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
-    }
+    app.activeDocument.paste(true);
+    // We need this to get rid of the 1px border we'd otherwise get
+    var cropDimensions = [
+        new UnitValue(1, "px"),
+        new UnitValue(1, "px"),
+        new UnitValue(horizontalPx + 1, "px"),
+        new UnitValue(verticalPx + 1, "px")
+    ]
+    app.activeDocument.crop(cropDimensions)
+    // resize to the output dimensions
+    tempImage.resizeImage(screens[i].horizontalPx, screens[i].verticalPx);
     // Save it as the supplied filename in the selected location
     tempImage.saveAs(new File(savePath + "/screen" + i + ".jpg"), wallpaperSaveOptions);
     // Close the file
     tempImage.close(SaveOptions.DONOTSAVECHANGES);
 
     // Set the offset for the next screen, by adding the width of the selection, and the width of the bezel
-    offsetLeft += (horizontalPx + bezelPx)
+    offsetLeft += (horizontalPx + bezelPx - 1)
 }
 
 // Close the source file
