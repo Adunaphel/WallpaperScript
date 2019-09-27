@@ -1,2 +1,2 @@
 # WallpaperScript
-Photoshop script for a contiguous wallpaper on 3 mismatched screens
+Photoshop script for a contiguous wallpaper on any number of (mismatched) screens
