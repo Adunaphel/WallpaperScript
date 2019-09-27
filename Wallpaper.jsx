@@ -105,6 +105,7 @@ for (i = 0; i < screens.length; i++) {
     app.activeDocument.selection.select(newSelection);
     // Paste the copied selection of the source file
     app.activeDocument.paste(true);
+    // We need this to get rid of the 1px border we'd otherwise get
     var cropDimensions = [
         new UnitValue(1, "px"),
         new UnitValue(1, "px"),
