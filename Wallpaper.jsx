@@ -9,12 +9,12 @@ var screens = [
         // Horizontal pixels
         1680,
         // Distance between top edge and highest top edge in mm
-        17,
+        112,
         // Width of horizontal bezel in mm
         14
     ),
-    new screenArea(336, 597, 2160, 3840, 0, 17),
-    new screenArea(313, 554, 1440, 2560, 3, 9)
+    new screenArea(336, 597, 2160, 3840, 70, 17),
+    new screenArea(554, 313, 2560, 1440, 0, 9)
 ];
 
 ///////////////////////////////////////////////////////////////////////////////
